@@ -1,0 +1,2 @@
+[libraries]
+graphql = { group = "com.expediagroup", name = "graphql-kotlin-spring-server", version = "6.3.2" }

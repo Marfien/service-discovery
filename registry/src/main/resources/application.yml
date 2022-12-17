@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      database: service-discovery
+      uri:
+
+graphql:
+  packages:
+    - dev.marfien.servicediscovery.registry.controller
+    - dev.marfien.servicediscovery.registry.model
