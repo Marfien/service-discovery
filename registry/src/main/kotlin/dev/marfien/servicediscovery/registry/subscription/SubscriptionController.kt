@@ -1,5 +1,6 @@
 package dev.marfien.servicediscovery.registry.subscription
 
+import com.expediagroup.graphql.generator.annotations.GraphQLDescription
 import com.expediagroup.graphql.generator.annotations.GraphQLIgnore
 import com.expediagroup.graphql.server.operations.Subscription
 import dev.marfien.servicediscovery.registry.model.Service
@@ -13,21 +14,6 @@ import reactor.core.publisher.FluxSink
 
 val registrationSubscribers = mutableListOf<FluxSink<Service>>()
 val removalSubscribers = mutableListOf<FluxSink<Service>>()
-
-@Component
-class ServiceSubscription(private val template: ReactiveMongoTemplate) : Subscription {
-
-    fun listenToRegistrations(): Publisher<Service> =
-        Flux.create({
-            registrationSubscribers.add( it.onDispose { registrationSubscribers.remove(it) } )
-        }, FluxSink.OverflowStrategy.LATEST)
-
-    fun listenToRemoval(): Publisher<Service> =
-        Flux.create({
-            removalSubscribers.add( it.onDispose { removalSubscribers.remove(it) } )
-        }, FluxSink.OverflowStrategy.LATEST)
-
-}
 
 @GraphQLIgnore
 @Controller
@@ -55,5 +41,23 @@ class SubscriptionController(val template: ReactiveMongoTemplate) {
             .filter(Criteria.where("operationType").`in`("delete"))
             .listen()
             .mapNotNull { it.body }
+
+}
+
+@Component
+class ServiceSubscription(private val template: ReactiveMongoTemplate) : Subscription {
+
+    @GraphQLDescription("""
+        Subscribes to all ge
+    """)
+    fun listenToRegistrations(): Publisher<Service> =
+        Flux.create({
+            registrationSubscribers.add( it.onDispose { registrationSubscribers.remove(it) } )
+        }, FluxSink.OverflowStrategy.LATEST)
+
+    fun listenToRemoval(): Publisher<Service> =
+        Flux.create({
+            removalSubscribers.add( it.onDispose { removalSubscribers.remove(it) } )
+        }, FluxSink.OverflowStrategy.LATEST)
 
 }
