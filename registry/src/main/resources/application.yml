@@ -2,9 +2,10 @@ spring:
   data:
     mongodb:
       database: service-discovery
-      uri:
+      uri: mongodb+srv://root:OzSSQymCQZZd86tf@service-discovery.nargo5k.mongodb.net/?retryWrites=true&w=majority
 
 graphql:
   packages:
-    - dev.marfien.servicediscovery.registry.controller
+    - dev.marfien.servicediscovery.registry.schema
+    - dev.marfien.servicediscovery.registry.subscription
     - dev.marfien.servicediscovery.registry.model
