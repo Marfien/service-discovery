@@ -2,7 +2,7 @@ spring:
   data:
     mongodb:
       database: service-discovery
-      uri:
+      uri: ${MONGODB_URI}
 
 graphql:
   packages:
