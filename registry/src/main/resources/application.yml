@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      database: service-discovery
+      uri: ${MONGODB_URI}

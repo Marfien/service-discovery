@@ -19,7 +19,6 @@ extra["testcontainersVersion"] = "1.17.6"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-    implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -29,6 +28,10 @@ dependencies {
     testImplementation("org.springframework.graphql:spring-graphql-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
+
+    // netflix dgs
+    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:5.5.0"))
+    implementation("com.netflix.graphql.dgs:graphql-dgs-webflux-starter")
 }
 
 dependencyManagement {
