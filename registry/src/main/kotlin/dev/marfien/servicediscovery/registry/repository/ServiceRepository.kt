@@ -1,6 +1,6 @@
 package dev.marfien.servicediscovery.registry.repository
 
-import dev.marfien.servicediscovery.registry.model.Service
+import dev.marfien.servicediscovery.model.Service
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository

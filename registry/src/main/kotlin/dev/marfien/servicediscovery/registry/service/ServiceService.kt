@@ -1,7 +1,7 @@
 package dev.marfien.servicediscovery.registry.service
 
-import dev.marfien.servicediscovery.registry.model.Service
-import dev.marfien.servicediscovery.registry.model.TopicGroup
+import dev.marfien.servicediscovery.model.Service
+import dev.marfien.servicediscovery.model.TopicGroup
 import dev.marfien.servicediscovery.registry.repository.ServiceRepository
 import org.springframework.data.domain.Pageable
 import reactor.core.publisher.Flux

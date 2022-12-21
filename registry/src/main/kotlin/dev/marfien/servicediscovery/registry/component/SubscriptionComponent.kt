@@ -1,6 +1,6 @@
 package dev.marfien.servicediscovery.registry.component
 
-import dev.marfien.servicediscovery.registry.model.Service
+import dev.marfien.servicediscovery.model.Service
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Component

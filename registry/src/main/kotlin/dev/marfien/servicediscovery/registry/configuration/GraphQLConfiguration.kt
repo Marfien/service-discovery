@@ -1,6 +1,6 @@
 package dev.marfien.servicediscovery.registry.configuration
 
-import dev.marfien.servicediscovery.registry.model.Service
+import dev.marfien.servicediscovery.model.Service
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import reactor.core.publisher.FluxSink

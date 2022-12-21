@@ -1,6 +1,8 @@
+import com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("com.netflix.dgs.codegen") version "5.6.3"
     id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.7.21"
@@ -13,6 +15,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 extra["testcontainersVersion"] = "1.17.6"
@@ -38,6 +41,16 @@ dependencyManagement {
     imports {
         mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
     }
+}
+
+tasks.withType<GenerateJavaTask> {
+    this.packageName = "dev.marfien.servicediscovery"
+    this.subPackageNameTypes = "model"
+
+    this.typeMapping["Service"] = "dev.marfien.servicediscovery.model.Service"
+    this.typeMapping["AnonymousService"] = "dev.marfien.servicediscovery.model.AnonymousService"
+
+
 }
 
 tasks.withType<KotlinCompile> {

@@ -1,0 +1,69 @@
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+}
+
+type Query {
+    findAllServicesPaged(page: Int = 0, pageSize: Int = 9): [Service]!
+    findAllServices: [Service]!
+
+    findAllServicesByHost(host: String!): [Service]!
+    findAllServicesByTopic(topic: String!): [Service]!
+
+    findAllSortedByTopic: [TopicGroup]!
+
+    findServiceById(id: ID!): Service
+}
+
+type Mutation {
+    register(service: AnonymousService!): Service!
+    remove(id: ID!): Boolean
+}
+
+type Subscription {
+
+    listenTo(event: [ServiceEventType!]!): Service!
+
+}
+
+type Service {
+    id: ID!
+    network: Network!
+    topic: String!
+    metadata(keys: [String!] = []): Dict!
+}
+
+input AnonymousService {
+    network: NetworkInput!
+    topic: String!
+    metadata: String
+}
+
+type Network {
+    host: String!
+    port: Int!
+}
+
+input NetworkInput {
+    host: String!
+    port: Int!
+}
+
+type TopicGroup {
+    topic: String!
+    services: [Service!]!
+}
+
+type ServiceEvent {
+    type: ServiceEvent!
+    service: Service!
+}
+
+enum ServiceEventType {
+    REGISTRATION,
+    REMOVAL,
+    UPDATE
+}
+
+scalar Dict
