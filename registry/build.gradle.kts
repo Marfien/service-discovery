@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.netflix.dgs.codegen") version "5.6.3"
     id("org.springframework.boot") version "3.0.0"
-    id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.7.21"
     kotlin("plugin.spring") version "1.7.21"
 }
@@ -33,14 +32,8 @@ dependencies {
     testImplementation("org.testcontainers:mongodb")
 
     // netflix dgs
-    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:5.5.0"))
-    implementation("com.netflix.graphql.dgs:graphql-dgs-webflux-starter")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
-    }
+    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
+    implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
 }
 
 tasks.withType<GenerateJavaTask> {
@@ -49,8 +42,6 @@ tasks.withType<GenerateJavaTask> {
 
     this.typeMapping["Service"] = "dev.marfien.servicediscovery.model.Service"
     this.typeMapping["AnonymousService"] = "dev.marfien.servicediscovery.model.AnonymousService"
-
-
 }
 
 tasks.withType<KotlinCompile> {

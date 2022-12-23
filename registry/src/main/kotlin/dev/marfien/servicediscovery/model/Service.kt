@@ -8,11 +8,11 @@ data class Service(
     @Id var id: String?,
     var network: Network,
     var topic: String,
-    var metadata: String
+//    var metadata: Map<String, Any> TODO
 )
 
-data class AnonymousService(var network: Network, var topic: String, var metadata: String?) {
+data class AnonymousService(var network: Network, var topic: String) {//, var metadata: Map<String, Any>?) { TODO
 
-    fun asService(): Service = Service(null, this.network, this.topic, this.metadata ?: "{}")
+    fun asService(): Service = Service(null, this.network, this.topic)//, this.metadata ?: mapOf())
 
 }
