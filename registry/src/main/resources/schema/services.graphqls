@@ -60,7 +60,7 @@ type TopicGroup {
 }
 
 type ServiceEvent {
-    type: ServiceEvent!
+    type: ServiceEventType!
     service: Service!
 }
 
