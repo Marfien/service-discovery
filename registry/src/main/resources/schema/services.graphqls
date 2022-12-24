@@ -18,6 +18,7 @@ type Query {
 type Mutation {
     register(service: AnonymousService!): Service!
     remove(id: ID!): Boolean
+    updateTTL(id: ID!): Boolean
 }
 
 type Subscription {
