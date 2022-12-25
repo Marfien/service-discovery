@@ -1,12 +1,5 @@
 plugins {
     kotlin("multiplatform")
-    id("com.apollographql.apollo3") version "3.7.3"
-}
-
-apollo {
-    service("service") {
-        packageName.set("${project.group}.client")
-    }
 }
 
 kotlin {
@@ -24,20 +17,11 @@ kotlin {
         nodejs()
     }
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(project(":common"))
-                implementation("com.apollographql.apollo3:apollo-runtime:3.7.3")
-            }
-        }
+        val commonMain by getting
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting
-        val jvmTest by getting
-        val jsMain by getting
-        val jsTest by getting
     }
 }

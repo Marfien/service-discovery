@@ -1,24 +1,22 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    kotlin("jvm") version "1.7.21"
+    val kotlinVersion = "1.7.21"
+
+    kotlin("jvm") version kotlinVersion apply false
+    kotlin("plugin.spring") version kotlinVersion apply false
+    kotlin("multiplatform") version kotlinVersion apply false
 }
 
 group = "dev.marfien"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
+allprojects {
+    this.group = "${this.group}.servicediscovery"
+    this.version = this.version
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
 
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    this.extra["javaVersion"] = JavaVersion.VERSION_17
 }
