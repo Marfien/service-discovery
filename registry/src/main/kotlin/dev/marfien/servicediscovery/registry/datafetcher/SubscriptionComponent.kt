@@ -4,10 +4,7 @@ import com.mongodb.client.model.changestream.OperationType
 import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsSubscription
 import com.netflix.graphql.dgs.InputArgument
-import dev.marfien.servicediscovery.model.Network
-import dev.marfien.servicediscovery.model.Service
-import dev.marfien.servicediscovery.model.ServiceEvent
-import dev.marfien.servicediscovery.model.ServiceEventType
+import dev.marfien.servicediscovery.model.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -21,13 +18,6 @@ import javax.annotation.PostConstruct
 class SubscriptionComponent(
     private val mongoSubscriber: MongoSubscriber
 ) {
-
-    init {
-        val logger = Logger.getLogger(this::class.java.simpleName)
-        listenTo(listOf(ServiceEventType.REMOVAL, ServiceEventType.REGISTRATION)).subscribe {
-            logger.info("Revceived: $it")
-        }
-    }
 
     @DgsSubscription
     fun listenTo(@InputArgument event: Collection<ServiceEventType>): Flux<ServiceEvent> = Flux.create({ sink ->
@@ -50,16 +40,24 @@ class MongoSubscriber {
     private lateinit var template: ReactiveMongoTemplate
 
     @PostConstruct
-    fun init() = this.subscribeToMongo().subscribe {
-        this.subscribers[it.type]!!.forEach { sink -> sink.next(it) }
+    fun init() {
+        this.subscribeToMongo().subscribe {
+            this.subscribers[it.type]!!.forEach { sink -> sink.next(it) }
+        }
     }
 
     fun subscribeToMongo(): Flux<ServiceEvent> = this.template
-        .changeStream(Service::class.java)
+        .changeStream(RegisteredService::class.java)
         .watchCollection("services")
         .filter(Criteria.where("operationType").`in`("delete", "insert", "update"))
         .listen()
-        .mapNotNull { ServiceEvent(it.operationType!!.toServiceEventType(), it.body ?: Service("", Network("", -1), "")) }
+        // TODO body on delete event
+        .mapNotNull {
+            ServiceEvent(
+                it.operationType!!.toServiceEventType(),
+                it.body ?: RegisteredService("Not implemented", Network("Not implemented", -1), "Not implemented")
+            )
+        }
 
 }
 
