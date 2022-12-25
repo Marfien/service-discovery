@@ -26,8 +26,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("com.apollographql.apollo3:apollo-runtime:3.7.3")
                 implementation(project(":common"))
+                implementation("com.apollographql.apollo3:apollo-runtime:3.7.3")
             }
         }
         val commonTest by getting {
