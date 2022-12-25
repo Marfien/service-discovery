@@ -2,18 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.springframework.boot") version "3.0.0"
-    kotlin("jvm") version "1.7.21"
-    kotlin("plugin.spring") version "1.7.21"
+    kotlin("jvm")
+    kotlin("plugin.spring")
 }
 
-group = "dev.marfien.servicediscovery"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
+java.sourceCompatibility = project.extra["javaVersion"] as JavaVersion
 
 dependencies {
     implementation(project(":common"))
@@ -35,7 +28,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+        jvmTarget = project.extra["javaVersion"].toString()
     }
 }
 

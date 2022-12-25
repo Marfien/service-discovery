@@ -1,6 +1,7 @@
 package dev.marfien.servicediscovery.model
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
@@ -12,7 +13,7 @@ data class RegisteredService(
 //    var metadata: Map<String, Any> TODO
 ) : Service {
 
-//    @Indexed(name = "ttl_index", expireAfterSeconds = 15) // TODO create constant
+    @Indexed(name = "ttl_index", expireAfterSeconds = 15) // TODO create constant
     var lastHealthSignal = Date()
 
 }
