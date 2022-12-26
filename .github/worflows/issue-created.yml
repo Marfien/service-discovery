@@ -1,0 +1,21 @@
+name: Issue opened
+
+# Goal:
+# - add state "needs review"
+
+# - when not added by project:
+#   - add to project service-discovery
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    if: github.event.issue.performed_via_github_app == null
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/users/Marfien/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
