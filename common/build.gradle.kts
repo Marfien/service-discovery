@@ -5,7 +5,7 @@ plugins {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = project.extra["javaVersion"].toString()
+            kotlinOptions.jvmTarget = rootProject.extra["javaVersion"].toString()
         }
         withJava()
         testRuns["test"].executionTask.configure {

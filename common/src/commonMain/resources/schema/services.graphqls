@@ -5,47 +5,47 @@ schema {
 }
 
 type Query {
-    findAllServices(pagination: Pagination): [Service]!
+    findAllServices(pagination: PaginationInput): [ServiceType]!
 
-    findAllServicesByHost(host: String!): [Service]!
-    findAllServicesByTopic(topic: String!): [Service]!
+    findAllServicesByHost(host: String!): [ServiceType]!
+    findAllServicesByTopic(topic: String!): [ServiceType]!
 
     findAllServicesSortedByTopic: [TopicGroup]!
 
-    findServiceById(id: ID!): Service
+    findServiceById(id: ID!): ServiceType
 }
 
 type Mutation {
-    register(service: AnonymousService!): Service!
-    remove(id: ID!): Boolean
+    registerService(service: ServiceInput!): ServiceType!
+    removeService(id: ID!): Boolean
     updateTTL(id: ID!): Boolean
 }
 
 type Subscription {
 
-    listenTo(event: [ServiceEventType!]!): Service!
+    listenTo(event: [ServiceEventType!]!): ServiceType!
 
 }
 
-input Pagination {
+input PaginationInput {
     page: Int!
     pageSize: Int!
 }
 
-type Service {
+type ServiceType {
     id: ID!
-    network: Network!
+    network: NetworkType!
     topic: String!
 #    metadata(keys: [String!] = []): Dict! TODO
 }
 
-input AnonymousService {
+input ServiceInput {
     network: NetworkInput!
     topic: String!
 #    metadata: String TODO
 }
 
-type Network {
+type NetworkType {
     host: String!
     port: Int!
 }
@@ -57,18 +57,16 @@ input NetworkInput {
 
 type TopicGroup {
     topic: String!
-    services: [Service!]!
+    services: [ServiceType!]!
 }
 
 type ServiceEvent {
     type: ServiceEventType!
-    service: Service!
+    service: ServiceType!
 }
 
 enum ServiceEventType {
-    REGISTRATION,
-    REMOVAL,
-    UPDATE
+    REGISTRATION REMOVAL UPDATE
 }
 
 scalar Dict

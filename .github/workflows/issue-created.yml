@@ -1,11 +1,5 @@
 name: Issue opened
 
-# Goal:
-# - add state "needs review"
-
-# - when not added by project:
-#   - add to project service-discovery
-
 on:
   issues:
     types: [opened]

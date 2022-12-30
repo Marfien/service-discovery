@@ -3,8 +3,8 @@ package dev.marfien.servicediscovery.registry.datafetcher
 import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsMutation
 import com.netflix.graphql.dgs.InputArgument
-import dev.marfien.servicediscovery.model.AnonymousService
-import dev.marfien.servicediscovery.model.RegisteredService
+import dev.marfien.servicediscovery.model.ServiceInput
+import dev.marfien.servicediscovery.model.ServiceType
 import dev.marfien.servicediscovery.registry.service.ServiceService
 import reactor.core.publisher.Mono
 
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono
 class MutationComponent(private val serviceService: ServiceService) {
 
     @DgsMutation
-    fun register(@InputArgument service: AnonymousService): Mono<RegisteredService> = this.serviceService.save(service)
+    fun register(@InputArgument service: ServiceInput): Mono<ServiceType> = this.serviceService.save(service)
 
     @DgsMutation
     fun remove(@InputArgument id: String): Mono<Void?> = this.serviceService.remove(id)

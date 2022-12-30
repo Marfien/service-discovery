@@ -9,14 +9,14 @@ plugins {
 group = "dev.marfien"
 version = "1.0-SNAPSHOT"
 
+extra["javaVersion"] = JavaVersion.VERSION_17
+
 allprojects {
-    this.group = "${this.group}.servicediscovery"
-    this.version = this.version
+    group = "${this.rootProject.group}.servicediscovery"
+    version = version
 
     repositories {
         mavenCentral()
         mavenLocal()
     }
-
-    this.extra["javaVersion"] = JavaVersion.VERSION_17
 }

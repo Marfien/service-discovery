@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.spring")
 }
 
-java.sourceCompatibility = project.extra["javaVersion"] as JavaVersion
+java.sourceCompatibility = rootProject.extra["javaVersion"] as JavaVersion
 
 dependencies {
     implementation(project(":common"))
@@ -28,7 +28,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = project.extra["javaVersion"].toString()
+        jvmTarget = rootProject.extra["javaVersion"].toString()
     }
 }
 

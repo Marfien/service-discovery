@@ -4,14 +4,17 @@ import com.mongodb.client.model.changestream.OperationType
 import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsSubscription
 import com.netflix.graphql.dgs.InputArgument
-import dev.marfien.servicediscovery.model.*
+import dev.marfien.servicediscovery.model.Network
+import dev.marfien.servicediscovery.model.ServiceEvent
+import dev.marfien.servicediscovery.model.ServiceEventType
+import dev.marfien.servicediscovery.model.ServiceType
+import dev.marfien.servicediscovery.registry.model.WrappedServiceType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
-import java.util.logging.Logger
 import javax.annotation.PostConstruct
 
 @DgsComponent
@@ -47,7 +50,7 @@ class MongoSubscriber {
     }
 
     fun subscribeToMongo(): Flux<ServiceEvent> = this.template
-        .changeStream(RegisteredService::class.java)
+        .changeStream(WrappedServiceType::class.java)
         .watchCollection("services")
         .filter(Criteria.where("operationType").`in`("delete", "insert", "update"))
         .listen()
@@ -55,7 +58,8 @@ class MongoSubscriber {
         .mapNotNull {
             ServiceEvent(
                 it.operationType!!.toServiceEventType(),
-                it.body ?: RegisteredService("Not implemented", Network("Not implemented", -1), "Not implemented")
+                it.body?.toServiceType()
+                    ?: ServiceType("Not implemented", "Not implemented", Network.createType("Not implemented", -1))
             )
         }
 

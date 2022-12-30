@@ -4,7 +4,17 @@ plugins {
 }
 
 apollo {
-    service("service") {
+    service("services") {
+
+        schemaFile.set(
+            rootProject.project("common")
+                .file("src")
+                .resolve("commonMain")
+                .resolve("resources")
+                .resolve("schema")
+                .resolve("services.graphqls")
+        )
+
         packageName.set("${project.group}.client")
     }
 }
@@ -12,7 +22,7 @@ apollo {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = project.extra["javaVersion"].toString()
+            kotlinOptions.jvmTarget = rootProject.extra["javaVersion"].toString()
         }
         withJava()
         testRuns["test"].executionTask.configure {
@@ -41,3 +51,5 @@ kotlin {
         val jsTest by getting
     }
 }
+
+operator fun <K : Any, V : Any> MapProperty<K, V>.set(key: K, value: V) = this.put(key, value)

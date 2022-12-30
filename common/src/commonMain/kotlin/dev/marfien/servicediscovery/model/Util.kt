@@ -1,5 +1,30 @@
 package dev.marfien.servicediscovery.model
 
-data class TopicGroup(val topic: String, val services: List<Service>)
+data class TopicGroup(
+    val topic: String?,
+    val services: List<ServiceType>?
+) {
 
-data class Pagination(val page: Int, val pageSize: Int)
+    companion object {
+
+        fun create(topic: String, services: List<ServiceType>?) =
+            TopicGroup(topic, services)
+
+    }
+
+}
+
+
+data class PaginationInput(
+    val page: Int,
+    val pageSize: Int
+) {
+
+    companion object {
+
+        fun create(page: Int, pageSize: Int) =
+            PaginationInput(page, pageSize)
+
+    }
+
+}
