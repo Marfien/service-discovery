@@ -26,4 +26,4 @@ data class ServiceType(
 data class ServiceInput(
     override val topic: String,
     override val network: NetworkInput
-) : Service
+) : Service, InputType

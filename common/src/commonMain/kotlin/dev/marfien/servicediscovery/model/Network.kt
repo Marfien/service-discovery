@@ -30,7 +30,7 @@ interface Network {
 data class NetworkInput internal constructor(
     override val host: String,
     override val port: Int
-) : Network
+) : Network, InputType
 
 data class NetworkType internal constructor(
     override val host: String?,

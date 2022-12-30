@@ -14,7 +14,7 @@ data class ServiceEvent(
 
 }
 
-enum class ServiceEventType {
+enum class ServiceEventType : InputType {
 
     REGISTRATION, REMOVAL, UPDATE
 

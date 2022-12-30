@@ -18,7 +18,7 @@ data class TopicGroup(
 data class PaginationInput(
     val page: Int,
     val pageSize: Int
-) {
+) : InputType {
 
     companion object {
 
