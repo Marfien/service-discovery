@@ -3,7 +3,10 @@ package dev.marfien.servicediscovery.client.operation
 import com.apollographql.apollo3.api.*
 import com.apollographql.apollo3.api.json.JsonReader
 import com.apollographql.apollo3.api.json.JsonWriter
+import com.apollographql.apollo3.exception.JsonDataException
+import com.apollographql.apollo3.exception.JsonEncodingException
 import com.benasher44.uuid.Uuid
+import dev.marfien.servicediscovery.client.model.constructFields
 import dev.marfien.servicediscovery.client.model.toDocumentType
 import kotlin.random.Random
 
@@ -17,12 +20,13 @@ class NamedQuery(
     private val document: String
 
     init {
-        this.document = ""
+        this.document =
+            "query $queryname${constructVariables()} ${
+                constructFields(this.sections)
+            }"
     }
 
-    override fun adapter(): Adapter<NamedQueryData> {
-        TODO("Not yet implemented")
-    }
+    override fun adapter(): Adapter<NamedQueryData> = NamedQueryDataAdapter
 
     override fun document(): String = this.document
 
@@ -60,15 +64,11 @@ class NamedQuery(
 
         fun addSection(section: CompiledSelection) = this.apply { this.sections += section }
 
-        fun withVariables(variables: List<QueryVariable>) = this.apply { this.variables = variables as? MutableList ?: variables.toMutableList() }
+        fun withQueryVariables(variables: List<QueryVariable>) = this.apply { this.variables = variables as? MutableList ?: variables.toMutableList() }
 
-        fun addVariables(variables: Collection<QueryVariable>) = this.apply { this.variables += variables }
+        fun addQueryVariables(variables: Collection<QueryVariable>) = this.apply { this.variables += variables }
 
-        fun addVariable(variable: QueryVariable) = this.apply { this.variables += variable }
-
-        fun buildWithVariables(variables: List<QueryVariable>) = NamedQuery(this.name, this.sections, variables)
-
-        fun buildWithVariables(vararg variables: QueryVariable) = buildWithVariables(variables.toList())
+        fun addQueryVariable(variable: QueryVariable) = this.apply { this.variables += variable }
 
     }
 
@@ -89,16 +89,66 @@ data class QueryVariable(
 
 }
 
-class NamedQueryData : Query.Data
+class NamedQueryData(val values: Map<String, Any?>) : Query.Data
 
 
 object NamedQueryDataAdapter : Adapter<NamedQueryData> {
 
     override fun fromJson(reader: JsonReader, customScalarAdapters: CustomScalarAdapters): NamedQueryData {
-        TODO("Not yet implemented")
+        return NamedQueryData(readObject(reader))
     }
 
-    override fun toJson(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters, value: NamedQueryData) {
-        TODO("Not yet implemented")
+    fun readJson(reader: JsonReader): Any? = when (val token = reader.peek()) {
+        JsonReader.Token.NULL -> null
+        JsonReader.Token.BEGIN_ARRAY -> readArray(reader)
+        JsonReader.Token.BEGIN_OBJECT -> readObject(reader)
+        JsonReader.Token.STRING -> reader.nextString()
+        JsonReader.Token.BOOLEAN -> reader.nextBoolean()
+        JsonReader.Token.LONG -> reader.nextLong()
+        JsonReader.Token.NUMBER -> reader.nextDouble()
+        else -> throw JsonDataException("Invalid token found: $token (Path: ${
+            reader.getPath()
+                .joinToString(".") { 
+                    when (it) { 
+                        is Int -> "[$it]"
+                        is String -> "\"$it\""
+                        else -> throw IllegalArgumentException("Found suspicious type in path: ${it::class}")
+                    }
+                } 
+        })")
+
     }
+
+    fun readObject(reader: JsonReader): Map<String, Any?> {
+        val map = mutableMapOf<String, Any?>()
+
+        reader.beginObject()
+
+        while (reader.peek() != JsonReader.Token.END_OBJECT) {
+            val key = reader.nextName()
+            val value = readJson(reader)
+
+            map[key] = value
+        }
+
+        reader.endObject()
+        return map
+    }
+
+    fun readArray(reader: JsonReader): List<Any?> {
+        val list = mutableListOf<Any?>()
+
+        reader.beginArray()
+
+        while (reader.peek() != JsonReader.Token.END_ARRAY) {
+            list += readJson(reader)
+        }
+
+        reader.endArray()
+        return list
+    }
+
+    override fun toJson(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters, value: NamedQueryData) =
+        throw JsonEncodingException("NamedQueryData cannot be encoded")
+
 }
