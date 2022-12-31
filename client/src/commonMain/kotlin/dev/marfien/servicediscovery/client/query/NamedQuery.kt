@@ -1,4 +1,4 @@
-package dev.marfien.servicediscovery.client.operation
+package dev.marfien.servicediscovery.client.query
 
 import com.apollographql.apollo3.api.*
 import com.apollographql.apollo3.api.json.JsonReader
@@ -13,11 +13,12 @@ import kotlin.random.Random
 class NamedQuery(
     val queryname: String,
     val sections: List<CompiledSelection>,
-    val variables: Collection<QueryVariable>
+    val queryVariables: Collection<QueryVariable>
 ) : Query<NamedQueryData> {
 
     private val id = Uuid(Random.nextLong(), Random.nextLong())
     private val document: String
+    private val variables = mutableListOf<SerializableVariable>()
 
     init {
         this.document =
@@ -40,12 +41,23 @@ class NamedQuery(
             .build()
 
     override fun serializeVariables(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters) {
-        TODO("Not yet implemented")
+        writer.beginObject()
+
+        this.variables.forEach {
+            writer.name(it.name.name)
+            it.value.writeToJson(writer)
+        }
+
+        writer.endObject()
     }
 
-    fun constructVariables(): String {
-
-    }
+    fun constructVariables(): String = this.queryVariables.takeUnless { it.isEmpty() }?.let {
+        it.joinToString(
+            prefix = "(",
+            postfix = ")",
+            separator = " "
+        ) { variable -> variable.toDocument() }
+    } ?: ""
 
     class Builder(val name: String) {
 
@@ -79,6 +91,13 @@ class NamedQuery(
     }
 
 }
+
+data class SerializableVariable(
+    val name: CompiledVariable,
+    val value: JsonSerializable
+)
+
+interface JsonSerializable { fun writeToJson(writer: JsonWriter) }
 
 data class QueryVariable(
     val name: CompiledVariable,
