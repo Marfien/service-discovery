@@ -10,30 +10,41 @@ import dev.marfien.servicediscovery.client.model.constructFields
 import dev.marfien.servicediscovery.client.model.toDocumentType
 import kotlin.random.Random
 
-class NamedQuery(
-    val queryname: String,
+enum class OperationType(val asString: String) {
+
+    QUERY("query"),
+    MUTATION("mutation"),
+    SUBSCRIPTION("subscription");
+
+    override fun toString(): String = this.asString
+
+}
+
+class NamedOperation(
+    val operationType: OperationType,
+    val operationName: String,
     val sections: List<CompiledSelection>,
-    val queryVariables: Collection<QueryVariable>
-) : Query<NamedQueryData> {
+    val operationVariables: Collection<OperationVariable>
+) : Query<NamedOperationData>, Mutation<NamedOperationData>, Subscription<NamedOperationData> {
 
     private val id = Uuid(Random.nextLong(), Random.nextLong())
     private val document: String
-    private val variables = mutableListOf<SerializableVariable>()
+    private var variables = mutableListOf<SerializableVariable>()
 
     init {
         this.document =
-            "query $queryname${constructVariables()} ${
+            "$operationType $operationName${constructVariables()} ${
                 constructFields(this.sections)
             }"
     }
 
-    override fun adapter(): Adapter<NamedQueryData> = NamedQueryDataAdapter
+    override fun adapter(): Adapter<NamedOperationData> = NamedOperationDataAdapter
 
     override fun document(): String = this.document
 
     override fun id(): String = this.id.toString()
 
-    override fun name(): String = this.queryname
+    override fun name(): String = this.operationName
 
     override fun rootField(): CompiledField =
         CompiledField.Builder("data", type)
@@ -51,7 +62,7 @@ class NamedQuery(
         writer.endObject()
     }
 
-    fun constructVariables(): String = this.queryVariables.takeUnless { it.isEmpty() }?.let {
+    private fun constructVariables(): String = this.operationVariables.takeUnless { it.isEmpty() }?.let {
         it.joinToString(
             prefix = "(",
             postfix = ")",
@@ -59,12 +70,13 @@ class NamedQuery(
         ) { variable -> variable.toDocument() }
     } ?: ""
 
-    class Builder(val name: String) {
+    class Builder(val type: OperationType, val name: String) {
 
         private var sections = mutableListOf<CompiledSelection>()
-        private var variables = mutableListOf<QueryVariable>()
+        private var variables = mutableListOf<OperationVariable>()
 
-        fun build(): NamedQuery = NamedQuery(
+        fun build(): NamedOperation = NamedOperation(
+            this.type,
             this.name,
             this.sections,
             this.variables
@@ -76,17 +88,17 @@ class NamedQuery(
 
         fun addSection(section: CompiledSelection) = this.apply { this.sections += section }
 
-        fun withQueryVariables(variables: List<QueryVariable>) = this.apply { this.variables = variables as? MutableList ?: variables.toMutableList() }
+        fun withOperationVariables(variables: List<OperationVariable>) = this.apply { this.variables = variables as? MutableList ?: variables.toMutableList() }
 
-        fun addQueryVariables(variables: Collection<QueryVariable>) = this.apply { this.variables += variables }
+        fun addOperationVariables(variables: Collection<OperationVariable>) = this.apply { this.variables += variables }
 
-        fun addQueryVariable(variable: QueryVariable) = this.apply { this.variables += variable }
+        fun addOperationVariable(variable: OperationVariable) = this.apply { this.variables += variable }
 
     }
 
     companion object {
 
-        val type = ObjectType.Builder("Query").build()
+        val type = ObjectType.Builder("Operation").build()
 
     }
 
@@ -97,9 +109,11 @@ data class SerializableVariable(
     val value: JsonSerializable
 )
 
-interface JsonSerializable { fun writeToJson(writer: JsonWriter) }
+interface JsonSerializable {
+    fun writeToJson(writer: JsonWriter)
+}
 
-data class QueryVariable(
+data class OperationVariable(
     val name: CompiledVariable,
     val type: CompiledType
 ) {
@@ -108,13 +122,13 @@ data class QueryVariable(
 
 }
 
-class NamedQueryData(val values: Map<String, Any?>) : Query.Data
+class NamedOperationData(val values: Map<String, Any?>) : Query.Data, Mutation.Data, Subscription.Data
 
 
-object NamedQueryDataAdapter : Adapter<NamedQueryData> {
+object NamedOperationDataAdapter : Adapter<NamedOperationData> {
 
-    override fun fromJson(reader: JsonReader, customScalarAdapters: CustomScalarAdapters): NamedQueryData {
-        return NamedQueryData(readObject(reader))
+    override fun fromJson(reader: JsonReader, customScalarAdapters: CustomScalarAdapters): NamedOperationData {
+        return NamedOperationData(readObject(reader))
     }
 
     fun readJson(reader: JsonReader): Any? = when (val token = reader.peek()) {
@@ -127,13 +141,13 @@ object NamedQueryDataAdapter : Adapter<NamedQueryData> {
         JsonReader.Token.NUMBER -> reader.nextDouble()
         else -> throw JsonDataException("Invalid token found: $token (Path: ${
             reader.getPath()
-                .joinToString(".") { 
-                    when (it) { 
+                .joinToString(".") {
+                    when (it) {
                         is Int -> "[$it]"
                         is String -> "\"$it\""
                         else -> throw IllegalArgumentException("Found suspicious type in path: ${it::class}")
                     }
-                } 
+                }
         })")
 
     }
@@ -167,7 +181,7 @@ object NamedQueryDataAdapter : Adapter<NamedQueryData> {
         return list
     }
 
-    override fun toJson(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters, value: NamedQueryData) =
-        throw JsonEncodingException("NamedQueryData cannot be encoded")
+    override fun toJson(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters, value: NamedOperationData) =
+        throw JsonEncodingException("NamedOperationData cannot be encoded")
 
 }
