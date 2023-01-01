@@ -20,6 +20,8 @@ data class PaginationInput(
     val pageSize: Int
 ) : InputType {
 
+    override fun toDocument(): String = "{ page: $page pageSize: $pageSize }"
+
     companion object {
 
         fun create(page: Int, pageSize: Int) =

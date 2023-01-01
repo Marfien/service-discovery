@@ -13,7 +13,7 @@ interface Network {
 
     fun toType(): NetworkType = when(this) {
         is NetworkType -> this
-        is NetworkInput -> NetworkType(this.host!!, this.port!!)
+        is NetworkInput -> NetworkType(this.host, this.port)
         else -> throw NotImplementedError()
     }
 
@@ -30,7 +30,12 @@ interface Network {
 data class NetworkInput internal constructor(
     override val host: String,
     override val port: Int
-) : Network, InputType
+) : Network, InputType {
+
+    override fun toDocument(): String = "{ host: \"$host\" port: $port }"
+
+}
+
 
 data class NetworkType internal constructor(
     override val host: String?,

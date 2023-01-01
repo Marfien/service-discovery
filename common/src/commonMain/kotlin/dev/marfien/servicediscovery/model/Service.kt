@@ -26,4 +26,8 @@ data class ServiceType(
 data class ServiceInput(
     override val topic: String,
     override val network: NetworkInput
-) : Service, InputType
+) : Service, InputType {
+
+    override fun toDocument(): String = "{ topic: \"$topic\" network: ${network.toDocument()} }"
+
+}

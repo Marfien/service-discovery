@@ -16,6 +16,8 @@ data class ServiceEvent(
 
 enum class ServiceEventType : InputType {
 
-    REGISTRATION, REMOVAL, UPDATE
+    REGISTRATION, REMOVAL, UPDATE;
+
+    override fun toDocument(): String = this.name
 
 }
