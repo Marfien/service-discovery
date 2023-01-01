@@ -3,9 +3,6 @@ package dev.marfien.servicediscovery.client.model
 import com.apollographql.apollo3.api.*
 import dev.marfien.servicediscovery.model.GraphQLType
 
-val GraphQLType.type: CustomScalarType
-    get() = CustomScalarType(this.name, this.kotlinType)
-
 fun CompiledSelection.toDocument(): String = when (this) {
     is CompiledField ->
         "$name${constructArguments()}${

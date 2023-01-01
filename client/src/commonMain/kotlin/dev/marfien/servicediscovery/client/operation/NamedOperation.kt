@@ -1,4 +1,4 @@
-package dev.marfien.servicediscovery.client.query
+package dev.marfien.servicediscovery.client.operation
 
 import com.apollographql.apollo3.api.*
 import com.apollographql.apollo3.api.json.JsonReader
