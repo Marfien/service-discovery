@@ -1,5 +1,7 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonWriter
+
 interface Service {
 
     val network: Network?
@@ -30,4 +32,10 @@ data class ServiceInput(
 
     override fun toDocument(): String = "{ topic: \"$topic\" network: ${network.toDocument()} }"
 
+    override fun writeJson(writer: JsonWriter) {
+        writer.beginObject()
+        writer.name("topic").value(this.topic)
+        this.network.writeJson(writer.name("network"))
+        writer.endObject()
+    }
 }

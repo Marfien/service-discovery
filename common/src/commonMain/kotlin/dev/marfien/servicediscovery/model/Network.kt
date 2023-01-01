@@ -1,5 +1,7 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonWriter
+
 interface Network {
 
     val host: String?
@@ -33,6 +35,13 @@ data class NetworkInput internal constructor(
 ) : Network, InputType {
 
     override fun toDocument(): String = "{ host: \"$host\" port: $port }"
+
+    override fun writeJson(writer: JsonWriter) {
+        writer.beginObject()
+        writer.name("host").value(this.host)
+        writer.name("port").value(this.port)
+        writer.endArray()
+    }
 
 }
 

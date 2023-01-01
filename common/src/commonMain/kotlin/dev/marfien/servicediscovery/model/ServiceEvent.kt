@@ -1,5 +1,7 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonWriter
+
 data class ServiceEvent(
     val type: ServiceEventType?,
     val service: ServiceType?
@@ -19,5 +21,7 @@ enum class ServiceEventType : InputType {
     REGISTRATION, REMOVAL, UPDATE;
 
     override fun toDocument(): String = this.name
+
+    override fun writeJson(writer: JsonWriter) { writer.value (this.name) }
 
 }

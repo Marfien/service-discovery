@@ -1,5 +1,7 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonWriter
+
 data class TopicGroup(
     val topic: String?,
     val services: List<ServiceType>?
@@ -21,6 +23,13 @@ data class PaginationInput(
 ) : InputType {
 
     override fun toDocument(): String = "{ page: $page pageSize: $pageSize }"
+
+    override fun writeJson(writer: JsonWriter) {
+        writer.beginObject()
+        writer.name("page").value(this.page)
+        writer.name("pageSize").value(this.pageSize)
+        writer.endObject()
+    }
 
     companion object {
 
