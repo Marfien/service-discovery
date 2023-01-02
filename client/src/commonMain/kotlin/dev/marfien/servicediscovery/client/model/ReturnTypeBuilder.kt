@@ -17,7 +17,7 @@ open class ReturnTypeBuilder : DocumentPart {
             "$k${v.toDocument()}"
         }
 
-    } ?: throw  throw IllegalStateException("Ether port or host must be used")
+    } ?: throw  throw IllegalStateException("At least one field has to be set")
 
     internal fun withField(name: String) {
         this.fields.getOrPut(name) { ScalarReturnTypeBuilderData() }

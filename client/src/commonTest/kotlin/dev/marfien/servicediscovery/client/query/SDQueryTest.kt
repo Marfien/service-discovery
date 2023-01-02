@@ -1,6 +1,7 @@
 package dev.marfien.servicediscovery.client.query
 
 import dev.marfien.servicediscovery.client.execute
+import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.asserter
@@ -8,9 +9,18 @@ import kotlin.test.asserter
 @Test
 fun testCustomQuery() = with(asserter) {
     runBlocking {
+        fun ServiceReturnTypeBuilder.full() {
+            withId()
+            withTopic()
+            withNetwork {
+                withHost()
+                withPort()
+            }
+        }
+
         val query = SDQuery.create {
             findAllServices {
-                withId()
+                full()
             }
             findAllServicesByHost(host = "localhost") {
                 withNetwork {
