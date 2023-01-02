@@ -44,8 +44,4 @@ object FindAllServicesDataAdapter : JsonAdapter<FindAllServicesData> {
             }
         }
     )
-
-    override fun toJson(writer: JsonWriter, value: FindAllServicesData) {
-        TODO("Not yet implemented")
-    }
 }

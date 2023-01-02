@@ -43,8 +43,4 @@ object FindAllServicesSortedByTopicDataAdapter : JsonAdapter<FindAllServicesSort
             }
         }
     )
-
-    override fun toJson(writer: JsonWriter, value: FindAllServicesSortedByTopicData) {
-        TODO("Not yet implemented")
-    }
 }
