@@ -39,18 +39,18 @@ open class ReturnTypeBuilder : DocumentPart {
 
 object NoOpReturnTypeBuilder : ReturnTypeBuilder()
 
-internal sealed interface ReturnTypeBuilderData : DocumentPart {
+private sealed interface ReturnTypeBuilderData : DocumentPart {
 
     val arguments: Map<String, InputType>
 
 }
 
-internal fun ReturnTypeBuilderData.constructArguments(): String = this.arguments.entries
+private fun ReturnTypeBuilderData.constructArguments(): String = this.arguments.entries
     .takeUnless { it.isEmpty() }
     ?.joinToString(separator = " ", prefix = "(", postfix = ")") { (k, v) -> "$k: ${v.toDocument()}" }
     ?: ""
 
-internal data class ScalarReturnTypeBuilderData(
+private data class ScalarReturnTypeBuilderData(
     override val arguments: Map<String, InputType> = mapOf()
 ) : ReturnTypeBuilderData {
 
@@ -58,7 +58,7 @@ internal data class ScalarReturnTypeBuilderData(
 
 }
 
-internal data class ComplexReturnTypeBuilderData(
+private data class ComplexReturnTypeBuilderData(
     val builder: ReturnTypeBuilder,
     override val arguments: Map<String, InputType> = mapOf()
 ) : ReturnTypeBuilderData {

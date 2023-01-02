@@ -4,17 +4,18 @@ import com.apollographql.apollo3.api.Adapter
 import com.apollographql.apollo3.api.CompiledField
 import com.apollographql.apollo3.api.CustomScalarAdapters
 import com.apollographql.apollo3.api.Query
-import com.apollographql.apollo3.api.json.JsonReader
 import com.apollographql.apollo3.api.json.JsonWriter
 import com.benasher44.uuid.Uuid
 import dev.marfien.servicediscovery.client.model.ReturnTypeBuilder
 import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
 import dev.marfien.servicediscovery.client.model.TopicGroupReturnTypeBuilder
-import dev.marfien.servicediscovery.json.JsonReaderBridge
+import dev.marfien.servicediscovery.json.JsonAdapter
+import dev.marfien.servicediscovery.json.JsonReader
 import dev.marfien.servicediscovery.model.PaginationInput
 import dev.marfien.servicediscovery.model.ServiceType
 import dev.marfien.servicediscovery.model.StringInput
 import dev.marfien.servicediscovery.model.TopicGroup
+import dev.marfien.servicediscovery.servicediscovery.client.ServiceQuery
 import kotlin.random.Random
 
 abstract class SDQuery<D : Query.Data>(
@@ -38,14 +39,14 @@ abstract class SDQuery<D : Query.Data>(
 
     companion object {
 
-        fun create(block: CustomQueryBuilder.() -> Unit) = CustomSDQuery(CustomQueryBuilder().apply(block))
+        fun create(block: CustomSDQueryBuilder.() -> Unit) = CustomSDQuery(CustomSDQueryBuilder().apply(block))
 
     }
 
 }
 
 class CustomSDQuery internal constructor(
-    builder: CustomQueryBuilder
+    builder: CustomSDQueryBuilder
 ) : SDQuery<CustomSDQueryData>(builder) {
 
     override fun adapter(): Adapter<CustomSDQueryData> = CustomSDQueryDataAdapter
@@ -64,21 +65,20 @@ class CustomSDQuery internal constructor(
 
 }
 
-object CustomSDQueryDataAdapter : Adapter<CustomSDQueryData> {
+object CustomSDQueryDataAdapter : JsonAdapter<CustomSDQueryData> {
 
-    override fun fromJson(reader: JsonReader, customScalarAdapters: CustomScalarAdapters): CustomSDQueryData {
-        val bridge = JsonReaderBridge(reader)
+    override fun fromJson(reader: JsonReader): CustomSDQueryData {
         val data = CustomSDQueryData()
 
-        while (bridge.hasNext()) {
-            when (val name = bridge.nextName()) {
-                "findAllServices" -> data.findAllServices = mutableListOf<ServiceType>().apply { bridge.nextArray { this += ServiceType.fromJson(bridge) } }
-                "findAllServicesByHost" -> data.findAllServicesByHost = mutableListOf<ServiceType>().apply { bridge.nextArray { this += ServiceType.fromJson(bridge) } }
-                "findAllServicesBtTopic" -> data.findAllServicesByTopic = mutableListOf<ServiceType>().apply { bridge.nextArray { this += ServiceType.fromJson(bridge) } }
-                "findAllServicesSortedByTopic" -> data.findAllServicesSortedByTopic = mutableListOf<TopicGroup>().apply { bridge.nextArray { this += TopicGroup.fromJson(bridge) } }
-                "findServicesById" -> data.findServiceById = ServiceType.fromJson(bridge)
+        while (reader.hasNext()) {
+            when (val name = reader.nextName()) {
+                "findAllServices" -> data.findAllServices = FindAllServicesDataAdapter.fromJson(reader).services
+                "findAllServicesByHost" -> data.findAllServicesByHost = FindAllServicesByHostDataAdapter.fromJson(reader).services
+                "findAllServicesBtTopic" -> data.findAllServicesByTopic = FindAllServicesByTopicDataAdapter.fromJson(reader).services
+                "findAllServicesSortedByTopic" -> data.findAllServicesSortedByTopic = FindAllServicesSortedByTopicDataAdapter.fromJson(reader).topicGroups
+                "findServiceById" -> data.findServiceById = FindServiceByIdDataAdapter.fromJson(reader).service
                 else -> {
-                    println("Skipping value: $name")
+                    println("Skipping unknown value: $name")
                     reader.skipValue()
                 }
             }
@@ -87,7 +87,7 @@ object CustomSDQueryDataAdapter : Adapter<CustomSDQueryData> {
         return data
     }
 
-    override fun toJson(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters, value: CustomSDQueryData) {
+    override fun toJson(writer: dev.marfien.servicediscovery.json.JsonWriter, value: CustomSDQueryData) {
         TODO("Not yet implemented")
     }
 }
@@ -100,7 +100,7 @@ data class CustomSDQueryData(
     var findServiceById: ServiceType? = null
 ) : Query.Data
 
-class CustomQueryBuilder : ReturnTypeBuilder() {
+class CustomSDQueryBuilder internal constructor() : ReturnTypeBuilder() {
 
     fun findAllServices(pagination: PaginationInput? = null, block: ServiceReturnTypeBuilder.() -> Unit) = apply {
         val builder = ServiceReturnTypeBuilder().apply(block)

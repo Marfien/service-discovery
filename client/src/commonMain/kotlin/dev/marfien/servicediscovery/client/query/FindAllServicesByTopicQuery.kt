@@ -8,18 +8,17 @@ import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
 import dev.marfien.servicediscovery.json.JsonAdapter
 import dev.marfien.servicediscovery.json.JsonReader
 import dev.marfien.servicediscovery.json.JsonWriter
-import dev.marfien.servicediscovery.model.PaginationInput
 import dev.marfien.servicediscovery.model.ServiceType
 import kotlin.random.Random
 
-class FindAllServicesQuery(
-    pagination: PaginationInput? = null,
+class FindAllServicesByTopicQuery(
+    host: String,
     block: ServiceReturnTypeBuilder.() -> Unit
-) : SDQuery<FindAllServicesData>(
-    CustomSDQueryBuilder().findAllServices(pagination, block)
+) : SDQuery<FindAllServicesByTopicData>(
+    CustomSDQueryBuilder().findAllServicesByTopic(host, block)
 ) {
 
-    override fun adapter(): Adapter<FindAllServicesData> = FindAllServicesDataAdapter
+    override fun adapter(): Adapter<FindAllServicesByTopicData> = FindAllServicesByTopicDataAdapter
 
     override fun id(): String = id.toString()
 
@@ -35,21 +34,17 @@ class FindAllServicesQuery(
 
 }
 
-data class FindAllServicesData(
+data class FindAllServicesByTopicData(
     val services: List<ServiceType>
 ) : Query.Data
 
-object FindAllServicesDataAdapter : JsonAdapter<FindAllServicesData> {
+object FindAllServicesByTopicDataAdapter : JsonAdapter<FindAllServicesByTopicData> {
 
-    override fun fromJson(reader: JsonReader): FindAllServicesData = FindAllServicesData(
+    override fun fromJson(reader: JsonReader): FindAllServicesByTopicData = FindAllServicesByTopicData(
         mutableListOf<ServiceType>().apply {
             reader.nextArray {
                 this += ServiceType.fromJson(reader)
             }
         }
     )
-
-    override fun toJson(writer: JsonWriter, value: FindAllServicesData) {
-        TODO("Not yet implemented")
-    }
 }
