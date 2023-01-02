@@ -30,6 +30,10 @@ abstract class SDQuery<D : Query.Data>(
             this.builder.toDocument()
         }"
 
+    override fun rootField(): CompiledField {
+        TODO("Not yet implemented")
+    }
+
     override fun serializeVariables(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters) = Unit //this.variables.takeUnless { it.isEmpty() }?.let {
 //        val bridge = JsonWriterBridge(writer)
 //

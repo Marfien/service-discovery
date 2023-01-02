@@ -23,10 +23,6 @@ class FindAllServicesQuery(
 
     override fun id(): String = id.toString()
 
-    override fun rootField(): CompiledField {
-        TODO("Not yet implemented")
-    }
-
     companion object {
 
         val id = Uuid(Random.nextLong(), Random.nextLong())
