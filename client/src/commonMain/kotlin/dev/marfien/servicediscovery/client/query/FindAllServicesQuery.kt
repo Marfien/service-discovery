@@ -7,10 +7,16 @@ import com.apollographql.apollo3.api.Query
 import com.apollographql.apollo3.api.json.JsonReader
 import com.apollographql.apollo3.api.json.JsonWriter
 import com.benasher44.uuid.Uuid
+import dev.marfien.servicediscovery.client.model.ReturnTypeBuilder
+import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
 import dev.marfien.servicediscovery.model.ServiceType
 import kotlin.random.Random
 
-class FindAllServicesQuery : SDQuery<FindAllServicesData>() {
+class FindAllServicesQuery(
+    builder: ServiceReturnTypeBuilder
+) : SDQuery<FindAllServicesData>(
+    ReturnTypeBuilder()
+) {
 
     override fun adapter(): Adapter<FindAllServicesData> = FindAllServicesDataAdapter
 

@@ -1,16 +1,34 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonReader
 import dev.marfien.servicediscovery.json.JsonWriter
 
 data class TopicGroup(
     val topic: String?,
-    val services: List<ServiceType>?
+    val services: List<ServiceType> = listOf()
 ) {
 
     companion object {
 
-        fun create(topic: String, services: List<ServiceType>?) =
+        fun create(topic: String, services: List<ServiceType>) =
             TopicGroup(topic, services)
+
+        fun fromJson(reader: JsonReader): TopicGroup {
+            var topic: String? = null
+            var services: MutableList<ServiceType> = mutableListOf()
+
+            reader.nextObject {
+                when (it) {
+                    "topic" -> topic = reader.nextString()
+                    "services" -> services.apply {
+                        reader.nextArray { this += ServiceType.fromJson(reader) }
+                    }
+                    else -> reader.skipValue()
+                }
+            }
+
+            return TopicGroup(topic, services)
+        }
 
     }
 

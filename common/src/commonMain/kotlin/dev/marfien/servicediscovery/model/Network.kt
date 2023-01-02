@@ -1,5 +1,6 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonReader
 import dev.marfien.servicediscovery.json.JsonWriter
 
 interface Network {
@@ -49,4 +50,21 @@ data class NetworkInput internal constructor(
 data class NetworkType internal constructor(
     override val host: String?,
     override val port: Int?
-) : Network
+) : Network {
+    companion object {
+        fun fromJson(reader: JsonReader): NetworkType {
+            var host: String? = null
+            var port: Int? = null
+
+            reader.nextObject {
+                when (it) {
+                    "host" -> host = reader.nextString()
+                    "port" -> port = reader.nextInt()
+                    else -> reader.skipValue()
+                }
+            }
+
+            return NetworkType(host, port)
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package dev.marfien.servicediscovery.client.model
 
 import dev.marfien.servicediscovery.model.DocumentPart
+import dev.marfien.servicediscovery.model.InputType
 
 open class ReturnTypeBuilder : DocumentPart {
 
@@ -18,50 +19,50 @@ open class ReturnTypeBuilder : DocumentPart {
 
     } ?: throw  throw IllegalStateException("Ether port or host must be used")
 
-    internal fun withField(name: String): Unit {
-        this.fields.getOrPut(name) { ScalarReturnTypeBuilderData }
+    internal fun withField(name: String) {
+        this.fields.getOrPut(name) { ScalarReturnTypeBuilderData() }
+    }
+
+    internal fun withField(name: String, vararg arguments: Pair<String, InputType>) {
+        this.fields.getOrPut(name) { ScalarReturnTypeBuilderData(arguments.toMap()) }
     }
 
     internal fun withField(name: String, builder: ReturnTypeBuilder) {
         this.fields[name] = ComplexReturnTypeBuilderData(builder)
     }
 
+    internal fun withField(name: String, builder: ReturnTypeBuilder, vararg arguments: Pair<String, InputType>) {
+        this.fields[name] = ComplexReturnTypeBuilderData(builder, arguments.toMap())
+    }
+
 }
 
 object NoOpReturnTypeBuilder : ReturnTypeBuilder()
 
-internal sealed interface ReturnTypeBuilderData : DocumentPart
+internal sealed interface ReturnTypeBuilderData : DocumentPart {
 
-object ScalarReturnTypeBuilderData : ReturnTypeBuilderData {
-
-    override fun toDocument(): String = ""
-}
-
-internal data class ComplexReturnTypeBuilderData(val builder: ReturnTypeBuilder) : ReturnTypeBuilderData {
-
-    override fun toDocument(): String = " ${this.builder.toDocument()}"
-}
-
-class NetworkReturnTypeBuilder : ReturnTypeBuilder() {
-
-    fun withHost() = apply { super.withField("host") }
-
-    fun withPort() = apply { super.withField("port") }
+    val arguments: Map<String, InputType>
 
 }
 
-class ServiceReturnTypeBuilder : ReturnTypeBuilder() {
+internal fun ReturnTypeBuilderData.constructArguments(): String = this.arguments.entries
+    .takeUnless { it.isEmpty() }
+    ?.joinToString(separator = " ", prefix = "(", postfix = ")") { (k, v) -> "$k: ${v.toDocument()}" }
+    ?: ""
 
-    fun withId() = apply {
-        super.withField("id")
-    }
+internal data class ScalarReturnTypeBuilderData(
+    override val arguments: Map<String, InputType> = mapOf()
+) : ReturnTypeBuilderData {
 
-    fun withTopic() = apply {
-        super.withField("topic")
-    }
-
-    fun withNetwork(block: (NetworkReturnTypeBuilder) -> Unit) = apply {
-        super.withField("network", NetworkReturnTypeBuilder().apply(block))
-    }
+    override fun toDocument(): String = this.constructArguments()
 
 }
+
+internal data class ComplexReturnTypeBuilderData(
+    val builder: ReturnTypeBuilder,
+    override val arguments: Map<String, InputType> = mapOf()
+) : ReturnTypeBuilderData {
+
+    override fun toDocument(): String = "${this.constructArguments()} ${this.builder.toDocument()}"
+}
+

@@ -1,5 +1,6 @@
 package dev.marfien.servicediscovery.model
 
+import dev.marfien.servicediscovery.json.JsonReader
 import dev.marfien.servicediscovery.json.JsonWriter
 
 interface Service {
@@ -23,7 +24,30 @@ data class ServiceType(
     val id: String?,
     override val topic: String?,
     override val network: NetworkType?
-) : Service
+) : Service {
+
+    companion object {
+
+        fun fromJson(reader: JsonReader): ServiceType {
+            var id: String? = null
+            var topic: String? = null
+            var network: NetworkType? = null
+
+            reader.nextObject {
+                when (it) {
+                    "id" -> id = reader.nextString()
+                    "topic" -> topic = reader.nextString()
+                    "network" -> network = NetworkType.fromJson(reader)
+                    else -> reader.skipValue()
+                }
+            }
+
+            return ServiceType(id, topic, network)
+        }
+
+    }
+
+}
 
 data class ServiceInput(
     override val topic: String,

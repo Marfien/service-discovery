@@ -1,4 +1,4 @@
-package dev.marfien.servicediscovery.client.client
+package dev.marfien.servicediscovery.client
 
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.ApolloResponse

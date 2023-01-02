@@ -36,6 +36,22 @@ interface JsonReader {
 
     fun getPath(): List<Any>
 
+    fun nextObject(block: (String) -> Unit) = apply {
+        this.beginObject()
+        while (this.peek() != Token.END_OBJECT) {
+            block(this.nextName())
+        }
+        this.endObject()
+    }
+
+    fun nextArray(block: () -> Unit) = apply {
+        this.beginArray()
+        while (this.peek() != Token.END_ARRAY) {
+            block()
+        }
+        this.endArray()
+    }
+
     enum class Token {
 
         BEGIN_ARRAY,
