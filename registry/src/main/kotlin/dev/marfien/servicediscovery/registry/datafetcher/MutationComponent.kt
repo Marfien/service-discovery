@@ -15,7 +15,7 @@ class MutationComponent(private val serviceService: ServiceService) {
     fun registerService(@InputArgument service: ServiceInput): Mono<ServiceType> = this.serviceService.save(service)
 
     @DgsMutation
-    fun removeService(@InputArgument id: String): Mono<Void?> = this.serviceService.remove(id)
+    fun removeService(@InputArgument id: String): Mono<Boolean> = this.serviceService.remove(id)
 
     @DgsMutation
     fun updateTTL(@InputArgument id: String): Mono<Boolean> = this.serviceService.updateTTL(id)

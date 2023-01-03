@@ -5,6 +5,7 @@ import dev.marfien.servicediscovery.registry.model.WrappedServiceType
 import dev.marfien.servicediscovery.registry.model.toWrappedService
 import dev.marfien.servicediscovery.registry.repository.ServiceRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
@@ -21,7 +22,11 @@ interface ServiceService {
     fun findAllSortedByTopic(): Flux<TopicGroup>
 
     fun save(service: ServiceInput): Mono<ServiceType>
-    fun remove(id: String): Mono<Void?>
+
+    @Transactional
+    fun remove(id: String): Mono<Boolean>
+
+    @Transactional
     fun updateTTL(id: String): Mono<Boolean>
 
 
@@ -62,8 +67,12 @@ class ServiceServiceImpl(val repository: ServiceRepository) : ServiceService {
         this.repository.save(service.toWrappedService())
     }
 
-    override fun remove(id: String): Mono<Void?> = this.repository.deleteById(id)
+    @Transactional
+    override fun remove(id: String): Mono<Boolean> = this.repository.existsById(id).doOnNext { exsits ->
+        if (exsits) this.repository.deleteById(id)
+    }
 
+    @Transactional
     override fun updateTTL(id: String): Mono<Boolean> = this.repository.existsById(id).doOnNext { exists ->
         if (!exists) return@doOnNext
 
