@@ -6,6 +6,8 @@ import com.apollographql.apollo3.api.CustomScalarAdapters
 import com.apollographql.apollo3.api.Query
 import com.apollographql.apollo3.api.json.JsonWriter
 import com.benasher44.uuid.Uuid
+import dev.marfien.servicediscovery.client.OperationType
+import dev.marfien.servicediscovery.client.SDOperation
 import dev.marfien.servicediscovery.client.model.ReturnTypeBuilder
 import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
 import dev.marfien.servicediscovery.client.model.TopicGroupReturnTypeBuilder
@@ -20,26 +22,8 @@ import kotlin.random.Random
 
 abstract class SDQuery<D : Query.Data>(
 //    val variables: Map<String, InputType> = mapOf(),
-    private val builder: ReturnTypeBuilder
-) : Query<D> {
-
-    override fun name(): String = this::class.simpleName ?: "AnonymousSDQuery"
-
-    override fun document(): String =
-        "query ${this.name()} ${
-            this.builder.toDocument()
-        }"
-
-    override fun rootField(): CompiledField {
-        TODO("Not yet implemented")
-    }
-
-    override fun serializeVariables(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters) = Unit //this.variables.takeUnless { it.isEmpty() }?.let {
-//        val bridge = JsonWriterBridge(writer)
-//
-//        it.forEach { (name, value) -> value.writeJson(bridge.name(name)) }
-//
-//    } ?: Unit
+    builder: ReturnTypeBuilder
+) : SDOperation(OperationType.QUERY, builder), Query<D> {
 
     companion object {
 
