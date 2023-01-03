@@ -35,3 +35,16 @@ data class BooleanInput(val value: Long) : InputType {
 
     override fun writeJson(writer: JsonWriter) { writer.value(this.value) }
 }
+
+data class ListInput<I : InputType>(val list: List<I>) : InputType {
+
+    override fun toDocument(): String = this.list.joinToString(prefix = "[", postfix = "]", separator = " ") { it.toDocument() }
+
+    override fun writeJson(writer: JsonWriter) {
+        writer.beginArray()
+
+        this.list.forEach { it.writeJson(writer) }
+
+        writer.endArray()
+    }
+}
