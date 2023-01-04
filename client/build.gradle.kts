@@ -31,12 +31,7 @@ kotlin {
         }
         val jvmMain by getting
         val jvmTest by getting
-        val jsMain by getting {
-            dependencies {
-                implementation(npm("dotenv", "16.0.1"))
-            }
-        }
-
+        val jsMain by getting
         val jsTest by getting
     }
 }

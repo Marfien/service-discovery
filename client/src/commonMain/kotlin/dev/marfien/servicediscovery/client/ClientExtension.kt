@@ -1,30 +1,42 @@
 package dev.marfien.servicediscovery.client
 
+import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Mutation
 import com.apollographql.apollo3.api.Query
 import com.apollographql.apollo3.api.Subscription
+import kotlinx.coroutines.flow.Flow
 
-private val client = ApolloClient.Builder()
-    .serverUrl("server-url") // TODO
-    .build()
+private lateinit var client: ApolloClient
 
-expect object ClientConfig {
-
-    val serverUrl: String
-    val webSocketUrl: String
-
+fun initSDClient(block: (ApolloClient.Builder) -> Unit) {
+    client = ApolloClient.Builder()
+        .apply(block)
+        .build()
 }
 
-fun <T : Query.Data> Query<T>.call() = client.query(this)
+private fun <T> withClient(block: (ApolloClient) -> T): T {
+    if (::client.isInitialized) return block(client)
 
-suspend fun <T : Query.Data> Query<T>.execute() = this.call().execute()
+    throw IllegalStateException("Client is not initialized. Call `initSDClient( (ApolloClient.Builder) -> Unit )` first")
+}
 
-fun <T : Mutation.Data> Mutation<T>.call() = client.mutation(this)
+fun <T : Query.Data> Query<T>.call(): ApolloCall<T> =
+    withClient { it.query(this) }
 
-suspend fun <T : Mutation.Data> Mutation<T>.execute() = this.call().execute()
+suspend fun <T : Query.Data> Query<T>.execute(): ApolloResponse<T> =
+    this.call().execute()
 
-fun <T : Subscription.Data> Subscription<T>.call() = client.subscription(this)
-fun <T : Subscription.Data> Subscription<T>.subscribe() = this.call().toFlow()
-suspend fun <T : Subscription.Data> Subscription<T>.subscribe(subscriber: (ApolloResponse<T>) -> Unit) = this.call().toFlow().collect { subscriber(it) }
+fun <T : Mutation.Data> Mutation<T>.call(): ApolloCall<T> =
+    withClient { it.mutation(this) }
+
+suspend fun <T : Mutation.Data> Mutation<T>.execute(): ApolloResponse<T> =
+    this.call().execute()
+
+fun <T : Subscription.Data> Subscription<T>.call(): ApolloCall<T> =
+    withClient { it.subscription(this) }
+fun <T : Subscription.Data> Subscription<T>.subscribe(): Flow<ApolloResponse<T>> =
+    this.call().toFlow()
+suspend fun <T : Subscription.Data> Subscription<T>.subscribe(subscriber: (ApolloResponse<T>) -> Unit): Unit =
+    this.call().toFlow().collect { subscriber(it) }
