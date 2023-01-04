@@ -1,10 +1,7 @@
 package dev.marfien.servicediscovery.client.query
 
 import com.apollographql.apollo3.api.Adapter
-import com.apollographql.apollo3.api.CompiledField
-import com.apollographql.apollo3.api.CustomScalarAdapters
 import com.apollographql.apollo3.api.Query
-import com.apollographql.apollo3.api.json.JsonWriter
 import com.benasher44.uuid.Uuid
 import dev.marfien.servicediscovery.client.OperationType
 import dev.marfien.servicediscovery.client.SDOperation
@@ -17,7 +14,6 @@ import dev.marfien.servicediscovery.model.PaginationInput
 import dev.marfien.servicediscovery.model.ServiceType
 import dev.marfien.servicediscovery.model.StringInput
 import dev.marfien.servicediscovery.model.TopicGroup
-import dev.marfien.servicediscovery.servicediscovery.client.ServiceQuery
 import kotlin.random.Random
 
 abstract class SDQuery<D : Query.Data>(

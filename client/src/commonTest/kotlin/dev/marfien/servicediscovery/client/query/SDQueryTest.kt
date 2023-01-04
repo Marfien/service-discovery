@@ -1,14 +1,14 @@
 package dev.marfien.servicediscovery.client.query
 
+import dev.marfien.servicediscovery.client.api.runTest
 import dev.marfien.servicediscovery.client.execute
 import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
-import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.asserter
 
 @Test
 fun testCustomQuery() = with(asserter) {
-    runBlocking {
+    runTest {
         fun ServiceReturnTypeBuilder.full() {
             withId()
             withTopic()

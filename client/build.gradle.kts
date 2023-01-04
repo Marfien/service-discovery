@@ -1,22 +1,5 @@
 plugins {
     kotlin("multiplatform")
-    id("com.apollographql.apollo3") version "3.7.3"
-}
-
-apollo {
-    service("services") {
-
-        schemaFile.set(
-            rootProject.project("common")
-                .file("src")
-                .resolve("commonMain")
-                .resolve("resources")
-                .resolve("schema")
-                .resolve("services.graphqls")
-        )
-
-        packageName.set("${project.group}.client")
-    }
 }
 
 kotlin {
@@ -29,10 +12,11 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    js(BOTH) {
-        browser()
+
+    js(IR) {
         nodejs()
     }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -47,7 +31,12 @@ kotlin {
         }
         val jvmMain by getting
         val jvmTest by getting
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("dotenv", "16.0.1"))
+            }
+        }
+
         val jsTest by getting
     }
 }

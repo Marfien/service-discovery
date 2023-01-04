@@ -4,12 +4,10 @@ import com.apollographql.apollo3.api.Adapter
 import com.apollographql.apollo3.api.Subscription
 import com.benasher44.uuid.Uuid
 import dev.marfien.servicediscovery.client.model.ServiceEventReturnTypeBuilder
-import dev.marfien.servicediscovery.client.model.ServiceReturnTypeBuilder
 import dev.marfien.servicediscovery.json.JsonAdapter
 import dev.marfien.servicediscovery.json.JsonReader
 import dev.marfien.servicediscovery.model.ServiceEvent
 import dev.marfien.servicediscovery.model.ServiceEventType
-import dev.marfien.servicediscovery.model.ServiceType
 import kotlin.random.Random
 
 class ListenToSubscription(

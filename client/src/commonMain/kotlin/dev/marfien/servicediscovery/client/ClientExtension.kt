@@ -10,6 +10,13 @@ private val client = ApolloClient.Builder()
     .serverUrl("server-url") // TODO
     .build()
 
+expect object ClientConfig {
+
+    val serverUrl: String
+    val webSocketUrl: String
+
+}
+
 fun <T : Query.Data> Query<T>.call() = client.query(this)
 
 suspend fun <T : Query.Data> Query<T>.execute() = this.call().execute()
